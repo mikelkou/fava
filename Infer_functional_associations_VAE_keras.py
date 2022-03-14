@@ -1,5 +1,7 @@
+import argparse
 import os
 import sys
+import tensorflow as tf
 import keras
 import numpy as np
 import pandas as pd
@@ -9,7 +11,6 @@ from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 from keras.models import Sequential, Model
 from sklearn.preprocessing import MinMaxScaler
-import tensorflow as tf
 from tensorflow.keras.optimizers import Adam
 import matplotlib.pyplot as plt
 import warnings
@@ -20,10 +21,27 @@ from keras import layers
 from keras import backend as K
 from sklearn.model_selection import train_test_split
 
+parser = argparse.ArgumentParser()
+
+parser.add_argument('--D', dest='DATA_PATH', type=str, 
+                    help='The absolute path of the data')
+parser.add_argument('--i', dest='intermediate_dim', default=500,
+                    help='Intermediate/hidden layer dimensions')
+parser.add_argument('--l', dest='latent_dim', default=100,
+                    help='Latent space dimensions')
+parser.add_argument('--e', dest='epochs', type=int, default=100,
+                    help='How many epochs?')
+parser.add_argument('--bs', dest='batch_size', type=int, default=32,
+                    help='batch_size')
+parser.add_argument('--ct', dest='PCC_cutoff', default=0.7,
+                    help='PCC_cutoff')
+parser.add_argument('--S', dest='SAVE_PATH',
+                    help='The absolute path where the output will be saved')
+
 args = parser.parse_args()
 DATA_PATH = args.DATA_PATH
 SAVE_PATH = args.SAVE_PATH
-intermediate_dim = args.intermediate
+intermediate_dim = args.intermediate_dim
 latent_dim = args.latent_dim
 epochs = args.epochs
 batch_size = args.batch_size
@@ -113,7 +131,6 @@ def create_protein_pairs(x_test_encoded=x_test_encoded, row_names=row_names):
 
     df_x_test_encoded_01 = pd.merge(df_x_test_encoded_0, df_x_test_encoded_1, left_index=True, right_index=True)
     df_x_test_encoded = pd.merge(df_x_test_encoded_01, df_x_test_encoded_2, left_index=True, right_index=True)
-    df_x_test_encoded
 
     # Correlation of the latent space
     df_x_test_encoded.index=row_names
@@ -127,13 +144,18 @@ def create_protein_pairs(x_test_encoded=x_test_encoded, row_names=row_names):
     correlation_df.columns = ['Protein_1','Protein_2','Score']
     return correlation_df
 
+correlation = create_protein_pairs(x_test_encoded, row_names)
+
 def pairs_after_cutoff(correlation=correlation, PCC_cutoff=0.7):
-    correlation_df_new = correlation_df.loc[(correlation_df['Score'] >= PCC_cutoff)]
+    correlation_df_new = correlation.loc[(correlation['Score'] >= PCC_cutoff)]
     return correlation_df_new
 
-correlation = create_protein_pairs()
-pairs_after_cutoff(PCC_cutoff=PCC_cutoff)
+final_pairs =  pairs_after_cutoff(correlation=correlation,PCC_cutoff=PCC_cutoff)
+final_pairs = final_pairs[final_pairs.iloc[:,0] != final_pairs.iloc[:,1]]
+final_pairs = final_pairs.sort_values(by=['Score'], ascending=False)
+
+print("Saving the file with the interactions in the chosen directory ...")
 
 # Save the file
-np.savetxt(SAVE_PATH, correlation_df_new, fmt='%s')
+np.savetxt(SAVE_PATH, final_pairs, fmt='%s')
 
