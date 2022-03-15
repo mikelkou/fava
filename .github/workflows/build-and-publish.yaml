@@ -1,10 +1,9 @@
 name: Build and publish to PyPI
 
 on:
-  #release:
-  #  types: [created]
-  push
-
+  release:
+    types: [created]
+  
 jobs:
   build:
     name: Build source distribution
@@ -23,7 +22,7 @@ jobs:
           pip install build setuptools oldest-supported-numpy flake8
       - name: Check for syntax errors
         run: |
-          flake8 ./fava --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 ./infava --count --select=E9,F63,F7,F82 --show-source --statistics
       - name: Build sdist and wheels
         run: python -m build
       - uses: actions/upload-artifact@v2
@@ -31,6 +30,31 @@ jobs:
           name: dist
           path: dist/*
 
+
+  build-streamlit-image:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - uses: actions/checkout@v2
+    - id: latest_release
+      uses: pozetroninc/github-action-get-latest-release@master
+      with:
+        owner: mikelkou
+        repo: VAE_Functional_associations
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Build and push to ghcr.io
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: |
+          ghcr.io/mikelkou/infava:${{ steps.latest_release.outputs.release }}
+          ghcr.io/mikelkou/infava:latest
 
   publish-to-pypi:
     needs: [build]
@@ -42,6 +66,6 @@ jobs:
           path: dist
       - uses: pypa/gh-action-pypi-publish@master
         with:
-          user: ${{ secrets.PYPI_USERNAME }}
-          password: ${{ secrets.PYPI_PASSWORD }}
+          user: __token__
+          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
   
