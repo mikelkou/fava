@@ -1,7 +1,7 @@
 FROM python:3
 
-COPY infava/ pyproject.toml setup.cfg ./
+COPY fava_tool/ pyproject.toml setup.cfg ./
 
 RUN pip install tensorflow keras numpy pandas
 
-CMD [ "python", "-m", "infava" ]
+CMD [ "python", "-m", "fava_tool" ]

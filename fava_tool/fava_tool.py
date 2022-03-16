@@ -10,6 +10,12 @@ import pandas as pd
 from keras import layers
 from keras import backend as K
 
+
+config = tf.compat.v1.ConfigProto()
+config.intra_op_parallelism_threads = 1
+config.inter_op_parallelism_threads = 1
+tf.compat.v1.Session(config=config)
+
 logger = logging.getLogger(__name__)
 
 def argument_parser():
@@ -107,11 +113,10 @@ def create_protein_pairs(x_test_encoded, row_names):
     df_x_test_encoded_01 = pd.merge(df_x_test_encoded_0, df_x_test_encoded_1, left_index=True, right_index=True)
     df_x_test_encoded = pd.merge(df_x_test_encoded_01, df_x_test_encoded_2, left_index=True, right_index=True)
 
+    df_x_test_encoded = np.asarray(df_x_test_encoded)
     # Correlation of the latent space
-    df_x_test_encoded.index=row_names
-
     # Pearson or Spearman
-    corr_pears = df_x_test_encoded.T.corr(method='pearson')
+    corr_pears = np.corrcoef(df_x_test_encoded)
     corr_pears = pd.DataFrame(corr_pears, columns= row_names, index=row_names)
     correlation_df = corr_pears.stack().reset_index()
 
@@ -140,7 +145,6 @@ def main():
     
     opt = tf.keras.optimizers.Adam(learning_rate=0.001, clipnorm=0.001)
     x_train = x_test = np.array(x) 
-
     vae = VAE(opt, x_train, x_test, batch_size, original_dim, intermediate_dim, latent_dim, epochs)
     x_test_encoded = np.array(vae.encoder.predict(x_test, batch_size=batch_size))
     correlation = create_protein_pairs(x_test_encoded, row_names)
