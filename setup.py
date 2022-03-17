@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="favapy",
-    version="0.2.0",
+    version="0.2.1",
     author="Mikaela Koutrouli",
     author_email="mikaela.koutrouli@cpr.ku.dk",
     description="Infer Functional Associations using Variational Autoencoders on -Omics data.",
@@ -22,8 +22,8 @@ setuptools.setup(
         "Intended Audience :: Science/Research",
         "Topic :: Scientific/Engineering :: Bio-Informatics"
     ],
-    package_dir={"": "favapy"},
-    packages=setuptools.find_packages(where="favapy"),
+    package_dir={"": "src"},
+    packages=setuptools.find_packages(where="src"),
     python_requires=">=3.7", 
     install_requires=["tensorflow", "keras", "numpy", "pandas"]
 )
