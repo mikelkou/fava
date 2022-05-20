@@ -1,2 +1,2 @@
 # FAVA
-![fava_beans_many](https://user-images.githubusercontent.com/81096946/169489192-c54ce449-ea3d-4d53-9e08-f768c2093130.png)
+![Screenshot 2022-05-20 at 16 58 07](https://user-images.githubusercontent.com/81096946/169566272-54b8c631-ddb9-455d-b17a-64464cba3d44.png)
