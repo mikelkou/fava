@@ -1,2 +1,3 @@
-# FAVA
-![Screenshot 2022-05-20 at 16 58 07](https://user-images.githubusercontent.com/81096946/169566272-54b8c631-ddb9-455d-b17a-64464cba3d44.png)
+# FAVA: Functional Associations using VAriational Autoencoders
+
+![Picture 1](https://user-images.githubusercontent.com/81096946/172628567-2b8f2bbc-bec5-4859-87a4-3bc7c0e72099.png)
