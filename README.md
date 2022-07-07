@@ -26,15 +26,15 @@ Run favapy from the command line as follows:
 
 ### Optional parameters:
 
-`--i The dimensions of the intermediate\hidden layer. Default value = 500.`
+`--i` The dimensions of the intermediate\hidden layer. Default value = 500.
 
-`--l The dimensions of the latent space. Default value = 100.`
+`--l` The dimensions of the latent space. Default value = 100.
 
-`--e The number of epochs. Default value = 100.`
+`--e` The number of epochs. Default value = 100.
 
-`--bs The  batch size. Default value = 32.`
+`--bs` The  batch size. Default value = 32.
 
-`--ct The cut-off on the Pearson Correlation scores. Default value = 0.7.`
+`--ct` The cut-off on the Pearson Correlation scores. Default value = 0.7.
 
 
 
