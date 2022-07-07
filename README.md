@@ -28,7 +28,7 @@ Run favapy from the command line as follows:
 
 `--i The dimensions of the intermediate\hidden layer. Default value = 500.`
 
-`--l The dimensions of the latent space. Default value = 100`
+`--l The dimensions of the latent space. Default value = 100.`
 
 `--e The number of epochs. Default value = 100.`
 
