@@ -18,7 +18,7 @@ The Network: https://doi.org/10.5281/zenodo.6803472
 ## Installation:
 `pip install favapy`
 
-Command line interface
+## Command line interface
 Run favapy from the command line as follows:
 
 `favapy -data_path <path-to-data-file> -save_path <path-to-save-output>`
