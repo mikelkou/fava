@@ -3,7 +3,6 @@ Results/
 .pytest_cache/
 .DS_Store
 
-
 # Custom MS2PIP stuff
 data/
 *_pyx.c
