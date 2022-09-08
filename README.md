@@ -146,7 +146,7 @@ A tendril is a path starting from a node of degree one, connected to a strongly 
 And other 965 tendrils.
 
 ## Embedding using First-order LINE
-Using a simple first-order LINE model trained and evaluated using a 70/30 split, we obtain:
+Using a simple first-order LINE model trained and evaluated using a 70/30 split, we obtain a significant separability of existing and non existing edges.
 
 ![First_order_line](https://github.com/LucaCappelletti94/fava/blob/main/line_model.png?raw=true)
 
