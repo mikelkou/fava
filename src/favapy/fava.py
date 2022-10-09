@@ -18,6 +18,29 @@ tf.compat.v1.Session(config=config)
 
 logger = logging.getLogger(__name__)
 
+def argument_parser():
+    parser = argparse.ArgumentParser(
+        description="Infer Functional Associations using Variational Autoencoders on -Omics data."
+    )
+    parser.add_argument('data_path', type=str, 
+                        help='The absolute path of the data.')
+    parser.add_argument('save_path', type=str,
+                        help='The absolute path where the output will be saved')
+    parser.add_argument('--i', dest='intermediate_dim', default=500,
+                        help='Intermediate/hidden layer dimensions')
+    parser.add_argument('--l', dest='latent_dim', default=100,
+                        help='Latent space dimensions')
+    parser.add_argument('--e', dest='epochs', type=int, default=100,
+                        help='How many epochs?')
+    parser.add_argument('--bs', dest='batch_size', type=int, default=32,
+                        help='batch_size')
+    parser.add_argument('--ct', dest='PCC_cutoff', default=0.7,
+                        help='PCC_cutoff')
+    args = parser.parse_args()
+    return args
+
+args = argument_parser()
+
 def load_data(data_path):
     """Loads the data and preprocesses it."""
     row_names = []
@@ -108,13 +131,14 @@ def pairs_after_cutoff(correlation, PCC_cutoff=0.7):
     return correlation_df_new
 
 
-def main(data_path,
-         save_path,
-         intermediate_dim=500,
-         latent_dim=50,
-         epochs=100,
-         batch_size=32,
-         PCC_cutoff=0.7):
+def main(data_path = args.data_path,
+        save_path = args.save_path,
+        intermediate_dim = args.intermediate_dim,
+         latent_dim = args.latent_dim,
+         epochs = args.epochs,
+         batch_size = args.batch_size,
+         PCC_cutoff = args.PCC_cutoff
+         ):
 
     x, row_names = load_data(data_path)
     original_dim = x.shape[1]
@@ -135,33 +159,4 @@ def main(data_path,
 
 
 if __name__ == "__main__":
-    def argument_parser():
-        parser = argparse.ArgumentParser(
-            description="Infer Functional Associations using Variational Autoencoders on -Omics data."
-        )
-        parser.add_argument('data_path', type=str, 
-                            help='The absolute path of the data.')
-        parser.add_argument('save_path', type=str,
-                            help='The absolute path where the output will be saved')
-        parser.add_argument('--i', dest='intermediate_dim', default=500,
-                            help='Intermediate/hidden layer dimensions')
-        parser.add_argument('--l', dest='latent_dim', default=100,
-                            help='Latent space dimensions')
-        parser.add_argument('--e', dest='epochs', type=int, default=100,
-                            help='How many epochs?')
-        parser.add_argument('--bs', dest='batch_size', type=int, default=32,
-                            help='batch_size')
-        parser.add_argument('--ct', dest='PCC_cutoff', default=0.7,
-                            help='PCC_cutoff')
-        args = parser.parse_args()
-        return args
-
-    args = argument_parser()
-    main(data_path = args.data_path,
-        save_path = args.save_path,
-        intermediate_dim = args.intermediate_dim,
-         latent_dim = args.latent_dim,
-         epochs = args.epochs,
-         batch_size = args.batch_size,
-         PCC_cutoff = args.PCC_cutoff
-        )
+    main()
