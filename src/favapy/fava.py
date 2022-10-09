@@ -130,6 +130,26 @@ def pairs_after_cutoff(correlation, PCC_cutoff=0.7):
     correlation_df_new = correlation.loc[(correlation['Score'] >= PCC_cutoff)]
     return correlation_df_new
 
+def fava_tutorial(data_path, 
+        save_path,
+        intermediate_dim = 500,
+        latent_dim = 50,
+        epochs = 100,
+        batch_size = 32,
+        PCC_cutoff = 0.7):
+
+    x, row_names = load_data(data_path)
+    original_dim = x.shape[1]
+    
+    opt = tf.keras.optimizers.Adam(learning_rate=0.001, clipnorm=0.001)
+    x_train = x_test = np.array(x) 
+    vae = VAE(opt, x_train, x_test, batch_size, original_dim, intermediate_dim, latent_dim, epochs)
+    x_test_encoded = np.array(vae.encoder.predict(x_test, batch_size=batch_size))
+    correlation = create_protein_pairs(x_test_encoded, row_names)
+    final_pairs =  pairs_after_cutoff(correlation,PCC_cutoff=PCC_cutoff)
+    final_pairs = final_pairs[final_pairs.iloc[:,0] != final_pairs.iloc[:,1]]
+    final_pairs = final_pairs.sort_values(by=['Score'], ascending=False)
+    return final_pairs
 
 def main(data_path = args.data_path,
         save_path = args.save_path,
