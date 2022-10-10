@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="favapy",
-    version="0.3.2",
+    version="0.3.5",
     author="Mikaela Koutrouli",
     author_email="mikaela.koutrouli@cpr.ku.dk",
     description="Infer Functional Associations using Variational Autoencoders on -Omics data.",

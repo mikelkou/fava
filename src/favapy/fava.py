@@ -39,7 +39,6 @@ def argument_parser():
     args = parser.parse_args()
     return args
 
-args = argument_parser()
 
 def load_data(data_path):
     """Loads the data and preprocesses it."""
@@ -130,8 +129,8 @@ def pairs_after_cutoff(correlation, PCC_cutoff=0.7):
     correlation_df_new = correlation.loc[(correlation['Score'] >= PCC_cutoff)]
     return correlation_df_new
 
-def fava_tutorial(data_path, 
-        save_path,
+
+def fava_notebook(data_path, 
         intermediate_dim = 500,
         latent_dim = 50,
         epochs = 100,
@@ -151,14 +150,16 @@ def fava_tutorial(data_path,
     final_pairs = final_pairs.sort_values(by=['Score'], ascending=False)
     return final_pairs
 
-def main(data_path = args.data_path,
-        save_path = args.save_path,
-        intermediate_dim = args.intermediate_dim,
-         latent_dim = args.latent_dim,
-         epochs = args.epochs,
-         batch_size = args.batch_size,
-         PCC_cutoff = args.PCC_cutoff
-         ):
+
+def main():
+    args = argument_parser()
+    data_path = args.data_path
+    save_path = args.save_path
+    intermediate_dim = args.intermediate_dim
+    latent_dim = args.latent_dim
+    epochs = args.epochs
+    batch_size = args.batch_size
+    PCC_cutoff = args.PCC_cutoff
 
     x, row_names = load_data(data_path)
     original_dim = x.shape[1]
