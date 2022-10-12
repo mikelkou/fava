@@ -35,7 +35,7 @@ Run favapy from the command line as follows:
 
 `-l` The dimensions of the latent space. Default value = 100.
 
-`-e` The number of epochs. Default value = 100.
+`-e` The number of epochs. Default value = 50.
 
 `-b` The  batch size. Default value = 32.
 
