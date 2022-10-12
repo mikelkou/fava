@@ -3,6 +3,8 @@ import argparse
 import warnings
 warnings.filterwarnings("ignore")
 
+import os
+import time
 import tensorflow as tf
 import keras
 import numpy as np
@@ -16,38 +18,50 @@ config.intra_op_parallelism_threads = 1
 config.inter_op_parallelism_threads = 1
 tf.compat.v1.Session(config=config)
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger().setLevel(logging.INFO)
+
+def custom_formatwarning(msg, *args, **kwargs):
+    # ignore everything except the message
+    return str(msg) + '\n'
+
+warnings.formatwarning = custom_formatwarning
 
 def argument_parser():
     parser = argparse.ArgumentParser(
         description="Infer Functional Associations using Variational Autoencoders on -Omics data."
     )
-    parser.add_argument('data_path', type=str, 
+    parser.add_argument('input_file', type=str, 
                         help='The absolute path of the data.')
-    parser.add_argument('save_path', type=str,
+    parser.add_argument('output_file', type=str,
                         help='The absolute path where the output will be saved')
-    parser.add_argument('--i', dest='intermediate_dim', default=500,
+    parser.add_argument('-t', '--data_type', type=str, default='tsv', choices=['tsv', 'csv'], 
+                        help='Type of input data.')
+    parser.add_argument('-c', dest='PCC_cutoff', type=float, default=0.7,
+                    help='The cut-off on the Pearson Correlation scores.')
+    parser.add_argument('-d', dest='hidden_layer', default=500,
                         help='Intermediate/hidden layer dimensions')
-    parser.add_argument('--l', dest='latent_dim', default=100,
+    parser.add_argument('-l', dest='latent_dim', default=100,
                         help='Latent space dimensions')
-    parser.add_argument('--e', dest='epochs', type=int, default=100,
+    parser.add_argument('-e', dest='epochs', type=int, default=50,
                         help='How many epochs?')
-    parser.add_argument('--bs', dest='batch_size', type=int, default=32,
+    parser.add_argument('-b', dest='batch_size', type=int, default=32,
                         help='batch_size')
-    parser.add_argument('--ct', dest='PCC_cutoff', default=0.7,
-                        help='PCC_cutoff')
+
     args = parser.parse_args()
     return args
 
 
-def load_data(data_path):
+def load_data(input_file,data_type):
     """Loads the data and preprocesses it."""
     row_names = []
     array = []
-    with open(data_path, 'r', encoding='utf-8') as infile:
+    with open(input_file, 'r', encoding='utf-8') as infile:
         next(infile)
         for line in infile:
-            line = line.split("\t")
+            if data_type == 'tsv': 
+                line = line.split("\t")
+            else:
+                line = line.split(",")
             row_names.append(line[0])
             array.append(line[1:])
 
@@ -59,10 +73,10 @@ def load_data(data_path):
 
 
 class VAE(keras.Model):
-    def __init__(self, opt, x_train, x_test, batch_size, original_dim, intermediate_dim, latent_dim, epochs):
+    def __init__(self, opt, x_train, x_test, batch_size, original_dim, hidden_layer, latent_dim, epochs):
         super(VAE, self).__init__()
         inputs = keras.Input(shape=(original_dim,))
-        h = layers.Dense(intermediate_dim, activation='relu')(inputs)
+        h = layers.Dense(hidden_layer, activation='relu')(inputs)
         
         z_mean = layers.Dense(latent_dim)(h)
         z_log_sigma = layers.Dense(latent_dim)(h)
@@ -81,7 +95,7 @@ class VAE(keras.Model):
         self.encoder = encoder
         # Create decoder
         latent_inputs = keras.Input(shape=(latent_dim,), name='z_sampling')
-        x = layers.Dense(intermediate_dim, activation='relu')(latent_inputs) #relu
+        x = layers.Dense(hidden_layer, activation='relu')(latent_inputs) #relu
 
         outputs = layers.Dense(original_dim, activation='sigmoid')(x)    
         decoder = keras.Model(latent_inputs, outputs, name='decoder')
@@ -130,19 +144,21 @@ def pairs_after_cutoff(correlation, PCC_cutoff=0.7):
     return correlation_df_new
 
 
-def fava_notebook(data_path, 
-        intermediate_dim = 500,
+def cook(input_file, 
+        data_type= "tsv",
+        hidden_layer = 500,
         latent_dim = 50,
-        epochs = 100,
+        epochs = 50,
         batch_size = 32,
-        PCC_cutoff = 0.7):
+        PCC_cutoff = 0.7,
+        ):
 
-    x, row_names = load_data(data_path)
+    x, row_names = load_data(input_file,data_type)
     original_dim = x.shape[1]
     
     opt = tf.keras.optimizers.Adam(learning_rate=0.001, clipnorm=0.001)
     x_train = x_test = np.array(x) 
-    vae = VAE(opt, x_train, x_test, batch_size, original_dim, intermediate_dim, latent_dim, epochs)
+    vae = VAE(opt, x_train, x_test, batch_size, original_dim, hidden_layer, latent_dim, epochs)
     x_test_encoded = np.array(vae.encoder.predict(x_test, batch_size=batch_size))
     correlation = create_protein_pairs(x_test_encoded, row_names)
     final_pairs =  pairs_after_cutoff(correlation,PCC_cutoff=PCC_cutoff)
@@ -151,32 +167,31 @@ def fava_notebook(data_path,
     return final_pairs
 
 
+
 def main():
     args = argument_parser()
-    data_path = args.data_path
-    save_path = args.save_path
-    intermediate_dim = args.intermediate_dim
-    latent_dim = args.latent_dim
-    epochs = args.epochs
-    batch_size = args.batch_size
-    PCC_cutoff = args.PCC_cutoff
 
-    x, row_names = load_data(data_path)
+    x, row_names = load_data(args.input_file,args.data_type)
     original_dim = x.shape[1]
-    
     opt = tf.keras.optimizers.Adam(learning_rate=0.001, clipnorm=0.001)
     x_train = x_test = np.array(x) 
-    vae = VAE(opt, x_train, x_test, batch_size, original_dim, intermediate_dim, latent_dim, epochs)
-    x_test_encoded = np.array(vae.encoder.predict(x_test, batch_size=batch_size))
+    vae = VAE(opt, x_train, x_test, args.batch_size, original_dim, args.hidden_layer, args.latent_dim, args.epochs)
+    x_test_encoded = np.array(vae.encoder.predict(x_test, batch_size=args.batch_size))
+
+    logging.info(" Calculating Pearson correlation scores. A cut-off of " + str(args.PCC_cutoff) + " is applied.")
+
     correlation = create_protein_pairs(x_test_encoded, row_names)
-    final_pairs =  pairs_after_cutoff(correlation,PCC_cutoff=PCC_cutoff)
+
+    logging.warn(" If it is not the desired cut-off, please check again the value assigned to the related parameter (-c or PCC_cutoff).")
+    
+    final_pairs =  pairs_after_cutoff(correlation,PCC_cutoff=args.PCC_cutoff)
     final_pairs = final_pairs[final_pairs.iloc[:,0] != final_pairs.iloc[:,1]]
     final_pairs = final_pairs.sort_values(by=['Score'], ascending=False)
-
-    logger.info("Saving the file with the interactions in the chosen directory ...")
+    logging.info(" Saving the file with the interactions in the chosen directory ...")
 
     # Save the file
-    np.savetxt(save_path, final_pairs, fmt='%s')
+    np.savetxt(args.output_file, final_pairs, fmt='%s')
+    logging.info(" Congratulations! A file is waitiing for you here: " + args.output_file)
 
 
 if __name__ == "__main__":

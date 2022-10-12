@@ -21,20 +21,24 @@ The Network: https://doi.org/10.5281/zenodo.6803472
 ## Command line interface
 Run favapy from the command line as follows:
 
-`favapy -data_path <path-to-data-file> -save_path <path-to-save-output>`
+
+`favapy <path-to-data-file> <path-to-save-output>`
 
 
 ### Optional parameters:
 
-`--i` The dimensions of the intermediate\hidden layer. Default value = 500.
+`-t` Type of input data ('tsv' or 'csv').
 
-`--l` The dimensions of the latent space. Default value = 100.
+`-c` The cut-off on the Pearson Correlation scores. Default value = 0.7.
 
-`--e` The number of epochs. Default value = 100.
+`-d` The dimensions of the intermediate\hidden layer. Default value = 500.
 
-`--bs` The  batch size. Default value = 32.
+`-l` The dimensions of the latent space. Default value = 100.
 
-`--ct` The cut-off on the Pearson Correlation scores. Default value = 0.7.
+`-e` The number of epochs. Default value = 100.
+
+`-b` The  batch size. Default value = 32.
+
 
 
 
