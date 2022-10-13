@@ -27,7 +27,7 @@ Run favapy from the command line as follows:
 
 ### Optional parameters:
 
-`-t` Type of input data ('tsv' or 'csv'). Default value = 'tsv'
+`-t` Type of input data ('tsv' or 'csv'). Default value = 'tsv'.
 
 `-c` The cut-off on the Pearson Correlation scores. Default value = 0.7.
 
