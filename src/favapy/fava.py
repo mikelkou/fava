@@ -38,9 +38,9 @@ def argument_parser():
                         help='Type of input data.')
     parser.add_argument('-c', dest='PCC_cutoff', type=float, default=0.7,
                     help='The cut-off on the Pearson Correlation scores.')
-    parser.add_argument('-d', dest='hidden_layer', default=500,
+    parser.add_argument('-d', dest='hidden_layer', default=None, type=int,
                         help='Intermediate/hidden layer dimensions')
-    parser.add_argument('-l', dest='latent_dim', default=100,
+    parser.add_argument('-l', dest='latent_dim', default=None, type=int,
                         help='Latent space dimensions')
     parser.add_argument('-e', dest='epochs', type=int, default=50,
                         help='How many epochs?')
@@ -146,8 +146,8 @@ def pairs_after_cutoff(correlation, PCC_cutoff=0.7):
 
 def cook(input_file, 
         data_type= "tsv",
-        hidden_layer = 500,
-        latent_dim = 50,
+        hidden_layer = None,
+        latent_dim = None,
         epochs = 50,
         batch_size = 32,
         PCC_cutoff = 0.7,
@@ -156,6 +156,22 @@ def cook(input_file,
     x, row_names = load_data(input_file,data_type)
     original_dim = x.shape[1]
     
+    if args.hidden_layer==None:
+        if original_dim >= 10000:
+            args.hidden_layer = 1000
+        if original_dim > 500 and original_dim < 10000:
+            args.hidden_layer = 500
+        if original_dim <= 500:
+            args.hidden_layer = 50
+
+    if args.latent_dim==None:
+        if args.hidden_layer >= 1000:
+            args.latent_dim = 100
+        if args.hidden_layer >= 500 and args.hidden_layer < 1000:
+            args.latent_dim = 50
+        if args.hidden_layer <= 500:
+            args.latent_dim = 5
+
     opt = tf.keras.optimizers.Adam(learning_rate=0.001, clipnorm=0.001)
     x_train = x_test = np.array(x) 
     vae = VAE(opt, x_train, x_test, batch_size, original_dim, hidden_layer, latent_dim, epochs)
@@ -173,6 +189,23 @@ def main():
 
     x, row_names = load_data(args.input_file,args.data_type)
     original_dim = x.shape[1]
+    
+    if args.hidden_layer==None:
+        if original_dim >= 10000:
+            args.hidden_layer = 1000
+        if original_dim > 500 and original_dim < 10000:
+            args.hidden_layer = 500
+        if original_dim <= 500:
+            args.hidden_layer = 50
+
+    if args.latent_dim==None:
+        if args.hidden_layer >= 1000:
+            args.latent_dim = 100
+        if args.hidden_layer >= 500 and args.hidden_layer < 1000:
+            args.latent_dim = 50
+        if args.hidden_layer <= 500:
+            args.latent_dim = 5
+
     opt = tf.keras.optimizers.Adam(learning_rate=0.001, clipnorm=0.001)
     x_train = x_test = np.array(x) 
     vae = VAE(opt, x_train, x_test, args.batch_size, original_dim, args.hidden_layer, args.latent_dim, args.epochs)

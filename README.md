@@ -31,9 +31,9 @@ Run favapy from the command line as follows:
 
 `-c` The cut-off on the Pearson Correlation scores. Default value = 0.7.
 
-`-d` The dimensions of the intermediate\hidden layer. Default value = 500.
+`-d` The dimensions of the intermediate\hidden layer. Default value depends on the input size.
 
-`-l` The dimensions of the latent space. Default value = 100.
+`-l` The dimensions of the latent space. Default value depends on the size of the hidden layer.
 
 `-e` The number of epochs. Default value = 50.
 
