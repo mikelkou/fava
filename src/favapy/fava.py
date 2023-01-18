@@ -66,7 +66,12 @@ def load_data(input_file,data_type):
             array.append(line[1:])
 
     expr = np.asarray(array, dtype=np.float32)
-    expr = np.log2(1+expr[:])
+    
+    if np.all(expr >= 0):
+        expr = np.log2(1+expr[:])
+    else:
+        logging.warn(" Negative values are detected, so log2 normalization is not applied.")
+    
     expr = expr / np.max(expr, axis=1, keepdims=True)
     expr = np.nan_to_num(expr)
     return expr, row_names
@@ -144,18 +149,34 @@ def pairs_after_cutoff(correlation, PCC_cutoff=0.7):
     return correlation_df_new
 
 
-def cook(input_file, 
-        data_type= "tsv",
-        hidden_layer = None,
+def cook(data,
+	log2_normalization = True,
+	hidden_layer = None,
         latent_dim = None,
         epochs = 50,
         batch_size = 32,
         PCC_cutoff = 0.7,
         ):
-
-    x, row_names = load_data(input_file,data_type)
-    original_dim = x.shape[1]
     
+    if type(data)==anndata._core.anndata.AnnData:
+        x = data.X
+        row_names = data.var.index
+    else:
+        x = np.asarray(data, dtype=np.float32)
+        row_names = data.index
+    
+    if np.any(data < 0):
+        log2_normalization = False
+        logging.warn(" Negative values are detected, so log2 normalization is not applied.")
+    
+    if log2_normalization == True:
+        x = np.log2(1+x[:])
+        logging.warn(" log2 normalization is applied.")
+
+    x = x / np.max(x, axis=1, keepdims=True)
+    x = np.nan_to_num(x)
+    
+    original_dim = x.shape[1]
     if args.hidden_layer==None:
         if original_dim >= 10000:
             args.hidden_layer = 1000
@@ -181,7 +202,6 @@ def cook(input_file,
     final_pairs = final_pairs[final_pairs.iloc[:,0] != final_pairs.iloc[:,1]]
     final_pairs = final_pairs.sort_values(by=['Score'], ascending=False)
     return final_pairs
-
 
 
 def main():

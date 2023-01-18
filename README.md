@@ -5,22 +5,27 @@ Protein networks are commonly used for understanding the interplay between prote
 
 
 ## Data availability
-#### Human Protein Atlas
-https://www.proteinatlas.org/humanproteome/single+cell+type 
-
-#### PRIDE - Proteomics Identification Database - EMBL-EBI
-https://www.ebi.ac.uk/pride/ 
-
 #### Combined network
 The Network: https://doi.org/10.5281/zenodo.6803472 
+
+#### Relevant publications:
+FAVA: High-quality functional association networks inferred from scRNA-seq and proteomics data
+https://doi.org/10.1101/2022.07.06.499022
+
+The STRING database in 2023
+https://doi.org/10.1093/nar/gkac1000
 
 
 ## Installation:
 `pip install favapy`
 
+## favapy as Python library
+Read the jupyter-notebook: How_to_use_favapy_in_a_notebook
+It supports both AnnData objects and counts matrices without any preprocessing setps.
+
+
 ## Command line interface
 Run favapy from the command line as follows:
-
 
 `favapy <path-to-data-file> <path-to-save-output>`
 
