@@ -5,6 +5,7 @@ warnings.filterwarnings("ignore")
 
 import os
 import time
+import anndata
 import tensorflow as tf
 import keras
 import numpy as np
@@ -159,13 +160,13 @@ def cook(data,
         ):
     
     if type(data)==anndata._core.anndata.AnnData:
-        x = data.X
+        x = data.X.T
         row_names = data.var.index
     else:
         x = np.asarray(data, dtype=np.float32)
         row_names = data.index
     
-    if np.any(data < 0):
+    if np.any(x < 0):
         log2_normalization = False
         logging.warn(" Negative values are detected, so log2 normalization is not applied.")
     
@@ -177,21 +178,21 @@ def cook(data,
     x = np.nan_to_num(x)
     
     original_dim = x.shape[1]
-    if args.hidden_layer==None:
+    if hidden_layer==None:
         if original_dim >= 10000:
-            args.hidden_layer = 1000
+            hidden_layer = 1000
         if original_dim > 500 and original_dim < 10000:
-            args.hidden_layer = 500
+            hidden_layer = 500
         if original_dim <= 500:
-            args.hidden_layer = 50
+            hidden_layer = 50
 
-    if args.latent_dim==None:
-        if args.hidden_layer >= 1000:
-            args.latent_dim = 100
-        if args.hidden_layer >= 500 and args.hidden_layer < 1000:
-            args.latent_dim = 50
-        if args.hidden_layer <= 500:
-            args.latent_dim = 5
+    if latent_dim==None:
+        if hidden_layer >= 1000:
+            latent_dim = 100
+        if hidden_layer >= 500 and hidden_layer < 1000:
+            latent_dim = 50
+        if hidden_layer <= 500:
+            latent_dim = 5
 
     opt = tf.keras.optimizers.Adam(learning_rate=0.001, clipnorm=0.001)
     x_train = x_test = np.array(x) 

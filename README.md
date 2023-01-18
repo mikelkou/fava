@@ -5,8 +5,7 @@ Protein networks are commonly used for understanding the interplay between prote
 
 
 ## Data availability
-#### Combined network
-The Network: https://doi.org/10.5281/zenodo.6803472 
+#### The Combined Network: https://doi.org/10.5281/zenodo.6803472 
 
 #### Relevant publications:
 FAVA: High-quality functional association networks inferred from scRNA-seq and proteomics data
