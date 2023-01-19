@@ -126,3 +126,9 @@ Supplementary Material/FAVA_logo/QR_code/qrcode_24866566_f4a1ed76ec8a9cbc2e44710
 Supplementary Material/FAVA_logo/QR_code/qrcode_24866566_f4a1ed76ec8a9cbc2e44710b95f19ea3 (4).png
 Supplementary Material/FAVA_logo/QR_code/qrcode_24866566_f4a1ed76ec8a9cbc2e44710b95f19ea3 (5).png
 Supplementary Material/FAVA_logo/QR_code/qrcode_24866566_f4a1ed76ec8a9cbc2e44710b95f19ea3.png
+%userprofile%.condapkgs/urls
+*.q
+*.json
+%userprofile%.condapkgs/cache/.227b7582.q.icloud
+%userprofile%.condapkgs/cache/.53d7ef51.q.icloud
+cache/data-filtered_gene_bc_matrices-hg19-matrix.h5ad
