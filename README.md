@@ -26,7 +26,7 @@ favpy supports both AnnData objects and count/abundance matrices.
 ## Command line interface
 Run favapy from the command line as follows:
 ```
-favapy <path-to-data-file> <path-to-save-output>`
+favapy <path-to-data-file> <path-to-save-output>
 ```
 
 ### Optional parameters:
