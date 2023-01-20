@@ -5,7 +5,7 @@ Results/
 
 
 # Custom MS2PIP stuff
-data/
+#data/
 *_pyx.c
 *_pyx_*.c
 ms2pip/models_xgboost/*.xgboost
@@ -132,3 +132,4 @@ Supplementary Material/FAVA_logo/QR_code/qrcode_24866566_f4a1ed76ec8a9cbc2e44710
 %userprofile%.condapkgs/cache/.227b7582.q.icloud
 %userprofile%.condapkgs/cache/.53d7ef51.q.icloud
 cache/data-filtered_gene_bc_matrices-hg19-matrix.h5ad
+data/cache/data-filtered_gene_bc_matrices-hg19-matrix.h5ad
