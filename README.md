@@ -10,12 +10,6 @@ Protein networks are commonly used for understanding the interplay between prote
 ## Data availability
 [The Combined Network](https://doi.org/10.5281/zenodo.6803472)
 
-#### Relevant publications:
-[FAVA: High-quality functional association networks inferred from scRNA-seq and proteomics data](https://doi.org/10.1101/2022.07.06.499022)
-
-[The STRING database in 2023](https://doi.org/10.1093/nar/gkac1000)
-
-
 ## Installation:
 ```
 pip install favapy
@@ -50,5 +44,7 @@ favapy <path-to-data-file> <path-to-save-output>
 
 ```
 
-*Author: Mikaela Koutrouli*
+If FAVA is useful for your research, consider citing [FAVA BiorXiv](https://doi.org/10.1101/2022.07.06.499022).
 
+#### Other Relevant publications:
+[The STRING database in 2023](https://doi.org/10.1093/nar/gkac1000).
