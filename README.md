@@ -18,7 +18,7 @@ pip install favapy
 ## favapy as Python library
 Read the jupyter-notebook: [How_to_use_favapy_in_a_notebook](https://github.com/mikelkou/fava/blob/main/How_to_use_favapy_in_a_notebook.ipynb)
 
-favpy supports both AnnData objects and count/abundance matrices.
+favapy supports both AnnData objects and count/abundance matrices.
 
 
 ## Command line interface
