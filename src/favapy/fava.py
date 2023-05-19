@@ -37,7 +37,9 @@ def argument_parser():
                         help='The absolute path where the output will be saved')
     parser.add_argument('-t', '--data_type', type=str, default='tsv', choices=['tsv', 'csv'], 
                         help='Type of input data.')
-    parser.add_argument('-c', dest='PCC_cutoff', type=float, default=0.7,
+    parser.add_argument('-n', dest='interaction_count', type=int, default=100000,
+                    help='The number of interactions in the output file.')
+    parser.add_argument('-c', dest='PCC_cutoff', type=float, default=None,
                     help='The cut-off on the Pearson Correlation scores.')
     parser.add_argument('-d', dest='hidden_layer', default=None, type=int,
                         help='Intermediate/hidden layer dimensions')
@@ -73,7 +75,9 @@ def load_data(input_file,data_type):
     else:
         logging.warn(" Negative values are detected, so log2 normalization is not applied.")
     
-    expr = expr / np.max(expr, axis=1, keepdims=True)
+    # expr = expr / np.max(expr, axis=1, keepdims=True)
+    constant = 1e-8  # small constant to avoid division by zero
+    expr = (expr - np.min(expr, axis=1, keepdims=True)) / (np.max(expr, axis=1, keepdims=True) - np.min(expr, axis=1, keepdims=True) + constant)
     expr = np.nan_to_num(expr)
     return expr, row_names
 
@@ -145,10 +149,14 @@ def create_protein_pairs(x_test_encoded, row_names):
     return correlation_df
 
 
-def pairs_after_cutoff(correlation, PCC_cutoff=0.7):
-    correlation_df_new = correlation.loc[(correlation['Score'] >= PCC_cutoff)]
+def pairs_after_cutoff(correlation, interaction_count=100000, PCC_cutoff=None):
+    if PCC_cutoff is not None and isinstance(PCC_cutoff, (int, float)):
+        logging.info(" A cut-off of " + str(PCC_cutoff) + " is applied.")
+        correlation_df_new = correlation.loc[(correlation['Score'] >= PCC_cutoff)]
+    else:
+        correlation_df_new = correlation.head(interaction_count+1)
+        logging.warn(" The number of interactions in the output file is " + str(interaction_count) + " in which both directions are included: proteinA - proteinB and proteinB - proteinA.")
     return correlation_df_new
-
 
 def cook(data,
 	log2_normalization = True,
@@ -156,7 +164,8 @@ def cook(data,
         latent_dim = None,
         epochs = 50,
         batch_size = 32,
-        PCC_cutoff = 0.7,
+        interaction_count = 100000,
+        PCC_cutoff = None,
         ):
     
     if type(data)==anndata._core.anndata.AnnData:
@@ -168,7 +177,7 @@ def cook(data,
     
     if np.any(x < 0):
         log2_normalization = False
-        logging.warn(" Negative values are detected, so log2 normalization is not applied.")
+        logging.warn(" Negative values are detected or log2_normalization was set to False, so log2 normalization is not applied.")
     
     if log2_normalization == True:
         x = np.log2(1+x[:])
@@ -179,9 +188,9 @@ def cook(data,
     
     original_dim = x.shape[1]
     if hidden_layer==None:
-        if original_dim >= 10000:
+        if original_dim >= 2000:
             hidden_layer = 1000
-        if original_dim > 500 and original_dim < 10000:
+        if original_dim > 500 and original_dim < 2000:
             hidden_layer = 500
         if original_dim <= 500:
             hidden_layer = 50
@@ -199,7 +208,7 @@ def cook(data,
     vae = VAE(opt, x_train, x_test, batch_size, original_dim, hidden_layer, latent_dim, epochs)
     x_test_encoded = np.array(vae.encoder.predict(x_test, batch_size=batch_size))
     correlation = create_protein_pairs(x_test_encoded, row_names)
-    final_pairs =  pairs_after_cutoff(correlation,PCC_cutoff=PCC_cutoff)
+    final_pairs =  pairs_after_cutoff(correlation, interaction_count=interaction_count, PCC_cutoff=PCC_cutoff)
     final_pairs = final_pairs[final_pairs.iloc[:,0] != final_pairs.iloc[:,1]]
     final_pairs = final_pairs.sort_values(by=['Score'], ascending=False)
     return final_pairs
@@ -212,9 +221,9 @@ def main():
     original_dim = x.shape[1]
     
     if args.hidden_layer==None:
-        if original_dim >= 10000:
+        if original_dim >= 2000:
             args.hidden_layer = 1000
-        if original_dim > 500 and original_dim < 10000:
+        if original_dim > 500 and original_dim < 2000:
             args.hidden_layer = 500
         if original_dim <= 500:
             args.hidden_layer = 50
@@ -231,14 +240,13 @@ def main():
     x_train = x_test = np.array(x) 
     vae = VAE(opt, x_train, x_test, args.batch_size, original_dim, args.hidden_layer, args.latent_dim, args.epochs)
     x_test_encoded = np.array(vae.encoder.predict(x_test, batch_size=args.batch_size))
-
-    logging.info(" Calculating Pearson correlation scores. A cut-off of " + str(args.PCC_cutoff) + " is applied.")
-
-    correlation = create_protein_pairs(x_test_encoded, row_names)
-
-    logging.warn(" If it is not the desired cut-off, please check again the value assigned to the related parameter (-c or PCC_cutoff).")
     
-    final_pairs =  pairs_after_cutoff(correlation,PCC_cutoff=args.PCC_cutoff)
+    logging.info(" Calculating Pearson correlation scores.")
+
+    correlation = create_protein_pairs(x_test_encoded, row_names)    
+    final_pairs =  pairs_after_cutoff(correlation, interaction_count=args.interaction_count, PCC_cutoff=args.PCC_cutoff)
+    logging.warn(" If it is not the desired cut-off, please check again the value assigned to the related parameter (-n or interaction_count | -c or PCC_cutoff).")
+
     final_pairs = final_pairs[final_pairs.iloc[:,0] != final_pairs.iloc[:,1]]
     final_pairs = final_pairs.sort_values(by=['Score'], ascending=False)
     logging.info(" Saving the file with the interactions in the chosen directory ...")

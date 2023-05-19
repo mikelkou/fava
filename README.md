@@ -32,7 +32,9 @@ favapy <path-to-data-file> <path-to-save-output>
 
 -t Type of input data ('tsv' or 'csv'). Default value = 'tsv'.
 
--c The cut-off on the Pearson Correlation scores. Default value = 0.7.
+-n The number of interactions in the output file (with both directions, proteinA-proteinB and proteinB-proteinA). Default value = 100000.
+
+-c The cut-off on the Pearson Correlation scores. This option overwrites the number of interactions. Default value = None.
 
 -d The dimensions of the intermediate\hidden layer. Default value depends on the input size.
 
