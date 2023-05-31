@@ -154,7 +154,7 @@ def pairs_after_cutoff(correlation, interaction_count=100000, PCC_cutoff=None):
         logging.info(" A cut-off of " + str(PCC_cutoff) + " is applied.")
         correlation_df_new = correlation.loc[(correlation['Score'] >= PCC_cutoff)]
     else:
-        correlation_df_new = correlation.head(interaction_count+1)
+        correlation_df_new = correlation.iloc[:interaction_count,:]
         logging.warn(" The number of interactions in the output file is " + str(interaction_count) + " in which both directions are included: proteinA - proteinB and proteinB - proteinA.")
     return correlation_df_new
 
@@ -208,9 +208,9 @@ def cook(data,
     vae = VAE(opt, x_train, x_test, batch_size, original_dim, hidden_layer, latent_dim, epochs)
     x_test_encoded = np.array(vae.encoder.predict(x_test, batch_size=batch_size))
     correlation = create_protein_pairs(x_test_encoded, row_names)
-    final_pairs =  pairs_after_cutoff(correlation, interaction_count=interaction_count, PCC_cutoff=PCC_cutoff)
-    final_pairs = final_pairs[final_pairs.iloc[:,0] != final_pairs.iloc[:,1]]
+    final_pairs = correlation[correlation.iloc[:,0] != correlation.iloc[:,1]]
     final_pairs = final_pairs.sort_values(by=['Score'], ascending=False)
+    final_pairs =  pairs_after_cutoff(correlation=final_pairs, interaction_count=interaction_count, PCC_cutoff=PCC_cutoff)
     return final_pairs
 
 
@@ -242,13 +242,14 @@ def main():
     x_test_encoded = np.array(vae.encoder.predict(x_test, batch_size=args.batch_size))
     
     logging.info(" Calculating Pearson correlation scores.")
-
     correlation = create_protein_pairs(x_test_encoded, row_names)    
-    final_pairs =  pairs_after_cutoff(correlation, interaction_count=args.interaction_count, PCC_cutoff=args.PCC_cutoff)
+
+    final_pairs = correlation[correlation.iloc[:,0] != correlation.iloc[:,1]]
+    final_pairs = final_pairs.sort_values(by=['Score'], ascending=False)
+    final_pairs =  pairs_after_cutoff(correlation=final_pairs, interaction_count=args.interaction_count, PCC_cutoff=args.PCC_cutoff)
+    final_pairs.Score = final_pairs.Score.astype(float).round(5)
     logging.warn(" If it is not the desired cut-off, please check again the value assigned to the related parameter (-n or interaction_count | -c or PCC_cutoff).")
 
-    final_pairs = final_pairs[final_pairs.iloc[:,0] != final_pairs.iloc[:,1]]
-    final_pairs = final_pairs.sort_values(by=['Score'], ascending=False)
     logging.info(" Saving the file with the interactions in the chosen directory ...")
 
     # Save the file
