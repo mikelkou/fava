@@ -31,6 +31,9 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
 html_sidebars = { '**': ['globaltoc.html', 'relations.html', 'sourcelink.html', 'searchbox.html'] }
-
+html_theme_options = {
+    'navigation_with_keys': True,
+    'collapse_navigation': False,
+}
 
 
