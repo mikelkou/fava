@@ -5,6 +5,12 @@ Welcome to favapy’s documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   introduction
+   installation
+   using_fava_as_python_library
+   command_line_interface
+   tutorials 
+
 Introduction
 -------------
 
