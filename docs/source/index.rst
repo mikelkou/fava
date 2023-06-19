@@ -11,6 +11,10 @@ Welcome to favapy’s documentation!
    command_line_interface
    tutorials 
 
+html_sidebars = {
+    '**': ['globaltoc.html', 'sourcelink.html', 'searchbox.html'],
+}
+
 Introduction
 -------------
 
