@@ -60,9 +60,3 @@ Tutorials
 
    ../../How_to_use_favapy_in_a_notebook.ipynb
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
