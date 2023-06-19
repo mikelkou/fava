@@ -1,3 +1,8 @@
 sphinx>=1.4
 ipykernel
 nbsphinx
+tensorflow
+keras
+numpy
+pandas
+anndata
