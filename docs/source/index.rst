@@ -11,16 +11,6 @@ Welcome to favapy’s documentation!
    command_line_interface
    tutorials 
    
-html_sidebars = {
-    '**': [
-        'about.html',
-        'navigation.html',
-        'relations.html',
-        'searchbox.html',
-        'donate.html',
-    ],
-}
-
 Introduction
 -------------
 
