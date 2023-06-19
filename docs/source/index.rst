@@ -10,9 +10,15 @@ Welcome to favapy’s documentation!
    using_fava_as_python_library
    command_line_interface
    tutorials 
-
+   
 html_sidebars = {
-    '**': ['globaltoc.html', 'sourcelink.html', 'searchbox.html'],
+    '**': [
+        'about.html',
+        'navigation.html',
+        'relations.html',
+        'searchbox.html',
+        'donate.html',
+    ],
 }
 
 Introduction
