@@ -30,9 +30,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
-if html_logo is None:
-    html_logo = '_static/Fava_logo.png'
-
+html_logo = '_static/Fava_logo.png'
 html_title = project + ' version ' + release
 html_theme = 'sphinx_rtd_theme'
 html_theme_options = {
