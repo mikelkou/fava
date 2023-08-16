@@ -27,6 +27,7 @@ jobs:
     env:
       OS: ${{ matrix.os }}
       PYTHON: ${{ matrix.python }}
+      DATA_DIR: ${{ github.workspace }}/data
 
     steps:
       - uses: actions/checkout@v3
