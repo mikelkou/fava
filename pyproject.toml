@@ -1,3 +1,9 @@
 [build-system]
 requires = ["setuptools>=42"]
 build-backend = "setuptools.build_meta"
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+]
