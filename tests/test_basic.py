@@ -1,18 +1,12 @@
-import pandas as pd
 from favapy import fava
+from scvi.data import synthetic_iid
 
-data = pd.read_csv(
-    "../data/Example_dataset_GSE75748_sc_cell_type_ec.tsv", sep="\t"
-).iloc[:100, :100]
-
-
-def test_package_has_version():
-    favapy.__version__
+adata = synthetic_iid()
 
 
 def test_favapy():
     FAVA_network = fava.cook(
-        data=data,
+        data=adata,
         log2_normalization=True,
         hidden_layer=None,
         latent_dim=None,
