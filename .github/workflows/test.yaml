@@ -42,7 +42,8 @@ jobs:
                   pip install codecov
             - name: Install dependencies
               run: |
-                  pip install ".[dev,test]"
+                  source ${{ env.PYTHON }}/bin/activate
+                  pip install ".[dev,test]" pytest
             - name: Test
               env:
                   MPLBACKEND: agg
