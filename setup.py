@@ -26,4 +26,10 @@ setuptools.setup(
     packages=setuptools.find_packages(where="src"),
     python_requires=">=3.7",
     install_requires=["tensorflow", "keras", "numpy", "pandas", "anndata"],
+    extras_require={
+        "test": [
+            "pytest",
+            "pytest-cov",
+        ],
+    },
 )
