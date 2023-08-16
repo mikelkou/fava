@@ -1,10 +1,15 @@
+import os
 import pandas as pd
+
 from favapy import fava
 
-data = pd.read_csv(
-    "/Users/tgn531/Desktop/fava/data/Example_dataset_GSE75748_sc_cell_type_ec.tsv",
-    sep="\t",
-).iloc[:100, :100]
+data_dir = os.environ.get("DATA_DIR")
+if data_dir is None:
+    raise ValueError("DATA_DIR environment variable not set")
+
+data_file_path = os.path.join(data_dir, "Example_dataset_GSE75748_sc_cell_type_ec.tsv")
+
+data = pd.read_csv(data_file_path, sep="\t").iloc[:100, :100]
 
 
 def test_favapy():
