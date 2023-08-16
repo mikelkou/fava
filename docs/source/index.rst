@@ -3,13 +3,13 @@ Welcome to favapy’s documentation!
 
 .. toctree::
    :maxdepth: 2
-   
+
    Introduction
    Installation
    Using FAVA as a Python library
    Command Line Interface
    Tutorials
-   
+
 Introduction
 -------------
 
@@ -61,9 +61,8 @@ Optional parameters:
 
 Tutorials
 ---------
-   
+
 .. toctree::
    :maxdepth: 2
 
    ../../How_to_use_favapy_in_a_notebook.ipynb
-

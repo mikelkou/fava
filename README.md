@@ -2,7 +2,7 @@
 <!-- ![Fava](https://user-images.githubusercontent.com/81096946/177743627-2e6a7447-3fc1-48a8-a6bb-003a3ace223a.png) -->
 <img src="https://user-images.githubusercontent.com/81096946/177743627-2e6a7447-3fc1-48a8-a6bb-003a3ace223a.png" alt="fava" width="500"/>
 
-FAVA, which stands for Functional Associations using Variational Autoencoders, is a method used to construct protein networks based on omics data such as single-cell RNA sequencing (scRNA-seq) and proteomics. Existing protein networks are often biased towards well-studied proteins, limiting their ability to reveal functions of understudied proteins. FAVA addresses this issue by leveraging omics data that are not influenced by literature bias. 
+FAVA, which stands for Functional Associations using Variational Autoencoders, is a method used to construct protein networks based on omics data such as single-cell RNA sequencing (scRNA-seq) and proteomics. Existing protein networks are often biased towards well-studied proteins, limiting their ability to reveal functions of understudied proteins. FAVA addresses this issue by leveraging omics data that are not influenced by literature bias.
 Read the [documentation](https://fava.readthedocs.io/en/latest/).
 
 [![PyPI version](https://badge.fury.io/py/favapy.svg)](https://badge.fury.io/py/favapy)

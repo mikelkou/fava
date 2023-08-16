@@ -3,7 +3,7 @@ name: Build and publish to PyPI
 on:
   release:
     types: [created]
-  
+
 jobs:
   build:
     name: Build source distribution
@@ -68,4 +68,3 @@ jobs:
         with:
           user: __token__
           password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-  

@@ -20,10 +20,10 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Intended Audience :: Science/Research",
-        "Topic :: Scientific/Engineering :: Bio-Informatics"
+        "Topic :: Scientific/Engineering :: Bio-Informatics",
     ],
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
-    python_requires=">=3.7", 
-    install_requires=["tensorflow", "keras", "numpy", "pandas", "anndata"]
+    python_requires=">=3.7",
+    install_requires=["tensorflow", "keras", "numpy", "pandas", "anndata"],
 )
