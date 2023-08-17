@@ -5,7 +5,6 @@ import warnings
 warnings.filterwarnings("ignore")
 
 import os
-import time
 import anndata
 import tensorflow as tf
 import keras
@@ -83,7 +82,23 @@ def argument_parser():
 
 
 def load_data(input_file, data_type):
-    """Loads the data and preprocesses it."""
+    """
+    Loads and preprocesses data from a file.
+
+    Parameters
+    ----------
+    input_file : str
+        Path to the input file.
+    data_type : str
+        Type of the data file ('tsv' or 'csv').
+
+    Returns
+    -------
+    expr : np.ndarray
+        Processed data array.
+    row_names : list
+        List of row names corresponding to the data.
+    """
     row_names = []
     array = []
     with open(input_file, "r", encoding="utf-8") as infile:
@@ -117,6 +132,29 @@ def load_data(input_file, data_type):
 
 
 class VAE(keras.Model):
+    """
+    Variational Autoencoder model class.
+
+    Parameters
+    ----------
+    opt : tf.keras.optimizers.Optimizer
+        Optimizer for the model.
+    x_train : np.ndarray
+        Training data.
+    x_test : np.ndarray
+        Test data.
+    batch_size : int
+        Batch size for training.
+    original_dim : int
+        Dimension of the input data.
+    hidden_layer : int
+        Number of units in the hidden layer.
+    latent_dim : int
+        Dimension of the latent space.
+    epochs : int
+        Number of training epochs.
+    """
+
     def __init__(
         self,
         opt,
@@ -180,6 +218,21 @@ class VAE(keras.Model):
 
 
 def create_protein_pairs(x_test_encoded, row_names):
+    """
+    Create pairs of proteins based on their encoded latent spaces.
+
+    Parameters
+    ----------
+    x_test_encoded : np.ndarray
+        Encoded latent spaces.
+    row_names : list
+        List of row names corresponding to the data.
+
+    Returns
+    -------
+    correlation_df : pd.DataFrame
+        DataFrame containing protein pairs and correlation scores.
+    """
     # Concatenate latent spaces
     df_x_test_encoded_0 = pd.DataFrame(x_test_encoded[0, :, :])
     df_x_test_encoded_1 = pd.DataFrame(x_test_encoded[1, :, :])
@@ -205,6 +258,23 @@ def create_protein_pairs(x_test_encoded, row_names):
 
 
 def pairs_after_cutoff(correlation, interaction_count=100000, PCC_cutoff=None):
+    """
+    Filter protein pairs based on correlation scores and cutoffs.
+
+    Parameters
+    ----------
+    correlation : pd.DataFrame
+        DataFrame containing protein pairs and correlation scores.
+    interaction_count : int, optional
+        Maximum number of interactions to include, by default 100000.
+    PCC_cutoff : float, optional
+        Pearson Correlation Coefficient cutoff, by default None.
+
+    Returns
+    -------
+    correlation_df_new : pd.DataFrame
+        Filtered DataFrame with selected protein pairs.
+    """
     if PCC_cutoff is not None and isinstance(PCC_cutoff, (int, float)):
         logging.info(" A cut-off of " + str(PCC_cutoff) + " is applied.")
         correlation_df_new = correlation.loc[(correlation["Score"] >= PCC_cutoff)]
@@ -228,7 +298,33 @@ def cook(
     interaction_count=100000,
     PCC_cutoff=None,
 ):
+    """
+    Preprocess data, train a Variational Autoencoder (VAE), and create filtered protein pairs.
 
+    Parameters
+    ----------
+    data : np.ndarray or anndata._core.anndata.AnnData
+        Input data or AnnData object.
+    log2_normalization : bool, optional
+        Whether to apply log2 normalization, by default True.
+    hidden_layer : int, optional
+        Number of units in the hidden layer, by default None.
+    latent_dim : int, optional
+        Dimension of the latent space, by default None.
+    epochs : int, optional
+        Number of training epochs, by default 50.
+    batch_size : int, optional
+        Batch size for training, by default 32.
+    interaction_count : int, optional
+        Maximum number of interactions to include, by default 100000.
+    PCC_cutoff : float, optional
+        Pearson Correlation Coefficient cutoff, by default None.
+
+    Returns
+    -------
+    final_pairs : pd.DataFrame
+        Filtered protein pairs based on correlation and cutoffs.
+    """
     if type(data) == anndata._core.anndata.AnnData:
         x = data.X.T
         row_names = data.var.index
@@ -284,6 +380,13 @@ def cook(
 
 
 def main():
+    """
+    Main function for preprocessing data, training VAE, and saving results.
+
+    This function loads data, applies preprocessing, trains a Variational Autoencoder (VAE),
+    calculates correlation scores between encoded latent spaces, filters protein pairs based
+    on correlation and cutoffs, and finally saves the results to a file.
+    """
     args = argument_parser()
 
     x, row_names = load_data(args.input_file, args.data_type)
