@@ -1,4 +1,4 @@
-# <img src="https://user-images.githubusercontent.com/81096946/177743627-2e6a7447-3fc1-48a8-a6bb-003a3ace223a.png" alt="fava" width="110"/> FAVA: Functional Associations using Variational Autoencoders
+# <img src="https://user-images.githubusercontent.com/81096946/177743627-2e6a7447-3fc1-48a8-a6bb-003a3ace223a.png" alt="fava" width="150"/> FAVA: Functional Associations using Variational Autoencoders
 
 
 [![PyPI version](https://badge.fury.io/py/favapy.svg)](https://badge.fury.io/py/favapy)
