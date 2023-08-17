@@ -1,7 +1,7 @@
 API Documentation
 =================
 
-.. automodule:: fava
+.. automodule:: favapy
    :members:
    :undoc-members:
    :show-inheritance:
