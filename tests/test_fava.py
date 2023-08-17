@@ -5,6 +5,7 @@ from pathlib import Path
 
 from favapy import fava
 
+
 @pytest.fixture
 def data_dir() -> Path:
     data_dir = os.environ.get("DATA_DIR")
@@ -13,9 +14,10 @@ def data_dir() -> Path:
     else:
         return Path(data_dir)
 
+
 @pytest.fixture
 def test_dataset(data_dir) -> pd.DataFrame:
-    data_file_path = data_dir /  "Example_dataset_GSE75748_sc_cell_type_ec.tsv"
+    data_file_path = data_dir / "Example_dataset_GSE75748_sc_cell_type_ec.tsv"
     return pd.read_csv(data_file_path, sep="\t").iloc[:100, :100]
 
 
