@@ -9,6 +9,7 @@ Welcome to favapy’s documentation!
    Using_FAVA_as_a_Python_library
    Command_Line_Interface
    Tutorials
+   How_to_use_favapy_in_a_notebook
 
 Introduction
 -------------
