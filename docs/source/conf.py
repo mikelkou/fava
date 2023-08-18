@@ -50,26 +50,11 @@ pygments_style = "default"
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-# extensions = [
-#    "sphinx.ext.autodoc",
-#    "sphinx.ext.napoleon",
-#    "nbsphinx",
-# ]
-
 extensions = [
-    "sphinx.ext.napoleon",
-    "myst_nb",
-    "sphinx_copybutton",
     "sphinx.ext.autodoc",
-    "sphinx.ext.intersphinx",
-    "sphinx.ext.autosummary",
-    "sphinx.ext.viewcode",
-    "sphinxcontrib.bibtex",
-    "sphinx_autodoc_typehints",
-    "sphinx.ext.mathjax",
-    *[p.stem for p in (HERE / "extensions").glob("*.py")],
+    "sphinx.ext.napoleon",
+    "nbsphinx",
 ]
-
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"]
