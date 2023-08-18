@@ -8,8 +8,8 @@ Welcome to favapy’s documentation!
    Installation
    Using_FAVA_as_a_Python_library
    Command_Line_Interface
-   Tutorials
    API
+   Tutorials
 
 Introduction
 -------------
