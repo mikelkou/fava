@@ -70,10 +70,3 @@ Optional parameters:
 ``-e`` The number of epochs. Default value = 50.
 
 ``-b`` The batch size. Default value = 32.
-
-
-Tutorials
----------
-
-.. toctree::
-   :maxdepth: 2
