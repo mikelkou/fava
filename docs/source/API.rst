@@ -1,9 +1,7 @@
 API
 =====
 
-.. currentmodule:: favapy
-
-.. autosummary::
-    :toctree: generated
-
-    cook
+.. automodule:: fava.cook
+   :members:
+   :undoc-members:
+   :show-inheritance:
