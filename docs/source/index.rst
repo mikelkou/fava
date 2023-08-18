@@ -8,7 +8,20 @@ Welcome to favapy’s documentation!
    Installation
    Using_FAVA_as_a_Python_library
    Command_Line_Interface
-   Tutorials
+
+
+.. toctree::
+   :maxdepth: 2
+
+   api
+
+Tutorials
+---------
+
+.. toctree::
+   :maxdepth: 2
+
+   How_to_use_favapy_in_a_notebook.ipynb
 
 Introduction
 -------------
@@ -64,5 +77,3 @@ Tutorials
 
 .. toctree::
    :maxdepth: 2
-
-   How_to_use_favapy_in_a_notebook.ipynb
