@@ -19,12 +19,6 @@ author = "Mikaela Koutrouli"
 version = "0.3.9"
 release = "0.3.9.4"
 
-source_suffix = {
-    ".rst": "restructuredtext",
-    ".ipynb": "myst-nb",
-    ".myst": "myst-nb",
-}
-
 # autodoc
 autosummary_generate = True
 autodoc_member_order = "groupwise"

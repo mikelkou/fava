@@ -7,8 +7,3 @@ API
     :toctree: generated
 
     cook
-
-#.. automodule:: favapy
-#   :members:
-#   :undoc-members:
-#   :show-inheritance:
