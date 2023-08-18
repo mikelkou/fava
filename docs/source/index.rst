@@ -11,19 +11,6 @@ Welcome to favapy’s documentation!
    Tutorials
    API
 
-:caption: Tutorials
-:hidden: true
-:maxdepth: 1
-
-tutorials/How_to_use_favapy_in_a_notebook
-
-
-:caption: API
-:hidden: true
-:maxdepth: 1
-
-api.md
-
 Introduction
 -------------
 
@@ -71,3 +58,10 @@ Optional parameters:
 ``-e`` The number of epochs. Default value = 50.
 
 ``-b`` The batch size. Default value = 32.
+
+## Tutorials
+
+.. toctree::
+   :maxdepth: 2
+
+   How_to_use_favapy_in_a_notebook.ipynb
