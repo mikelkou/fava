@@ -44,6 +44,12 @@ jobs:
       - name: Install dependencies
         run: |
           pip install ${{ matrix.pip-flags }} ".[dev,test]"
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
       - name: Test
         env:
           MPLBACKEND: agg
@@ -51,7 +57,3 @@ jobs:
           DISPLAY: :42
         run: |
           pytest -v --cov --color=yes
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
