@@ -1,6 +1,6 @@
-sphinx>=2.2.0
-ipykernel
+sphinx>=3.0
 nbsphinx
+ipykernel
 tensorflow
 keras
 numpy
