@@ -55,10 +55,10 @@ def argument_parser():
     )
     parser.add_argument(
         "-c",
-        dest="PCC_cutoff",
+        dest="CC_cutoff",
         type=float,
         default=None,
-        help="The cut-off on the Pearson Correlation scores.",
+        help="The cut-off on the Correlation scores.",
     )
     parser.add_argument(
         "-d",
@@ -75,6 +75,14 @@ def argument_parser():
     )
     parser.add_argument(
         "-b", dest="batch_size", type=int, default=32, help="batch_size"
+    )
+    parser.add_argument(
+        "-cor",
+        "--correlation_type",
+        type=str,
+        default="pearson",
+        choices=["pearson", "spearman"],
+        help="Type of correlation to use (Pearson or Spearman).",
     )
 
     args = parser.parse_args()
@@ -217,7 +225,7 @@ class VAE(keras.Model):
         )
 
 
-def create_protein_pairs(x_test_encoded, row_names):
+def create_protein_pairs(x_test_encoded, row_names, correlation_type="pearson"):
     """
     Create pairs of proteins based on their encoded latent spaces.
 
@@ -227,6 +235,8 @@ def create_protein_pairs(x_test_encoded, row_names):
         Encoded latent spaces.
     row_names : list
         List of row names corresponding to the data.
+    correlation_type : str
+        Type of correlation to use (Pearson or Spearman).
 
     Returns
     -------
@@ -246,18 +256,23 @@ def create_protein_pairs(x_test_encoded, row_names):
     )
 
     df_x_test_encoded = np.asarray(df_x_test_encoded)
-    # Correlation of the latent space
-    # Pearson or Spearman
-    corr_pears = np.corrcoef(df_x_test_encoded)
-    corr_pears = pd.DataFrame(corr_pears, columns=row_names, index=row_names)
-    correlation_df = corr_pears.stack().reset_index()
+
+    # Correlation of the latent space: Pearson or Spearman
+    if correlation_type == "spearman":
+        corr = pd.DataFrame(df_x_test_encoded.T).corr(method="spearman")
+        corr.columns = corr.index = row_names
+    else:
+        corr = np.corrcoef(df_x_test_encoded)
+        corr = pd.DataFrame(corr, columns=row_names, index=row_names)
+
+    correlation_df = corr.stack().reset_index()
 
     # set column names
     correlation_df.columns = ["Protein_1", "Protein_2", "Score"]
     return correlation_df
 
 
-def pairs_after_cutoff(correlation, interaction_count=100000, PCC_cutoff=None):
+def pairs_after_cutoff(correlation, interaction_count=100000, CC_cutoff=None):
     """
     Filter protein pairs based on correlation scores and cutoffs.
 
@@ -267,17 +282,17 @@ def pairs_after_cutoff(correlation, interaction_count=100000, PCC_cutoff=None):
         DataFrame containing protein pairs and correlation scores.
     interaction_count : int, optional
         Maximum number of interactions to include, by default 100000.
-    PCC_cutoff : float, optional
-        Pearson Correlation Coefficient cutoff, by default None.
+    CC_cutoff : float, optional
+        Correlation Coefficient cutoff, by default None.
 
     Returns
     -------
     correlation_df_new : pd.DataFrame
         Filtered DataFrame with selected protein pairs.
     """
-    if PCC_cutoff is not None and isinstance(PCC_cutoff, (int, float)):
-        logging.info(" A cut-off of " + str(PCC_cutoff) + " is applied.")
-        correlation_df_new = correlation.loc[(correlation["Score"] >= PCC_cutoff)]
+    if CC_cutoff is not None and isinstance(CC_cutoff, (int, float)):
+        logging.info(" A cut-off of " + str(CC_cutoff) + " is applied.")
+        correlation_df_new = correlation.loc[(correlation["Score"] >= CC_cutoff)]
     else:
         correlation_df_new = correlation.iloc[:interaction_count, :]
         logging.warn(
@@ -296,7 +311,8 @@ def cook(
     epochs=50,
     batch_size=32,
     interaction_count=100000,
-    PCC_cutoff=None,
+    correlation_type="pearson",
+    CC_cutoff=None,
 ):
     """
     Preprocess data, train a Variational Autoencoder (VAE), and create filtered protein pairs.
@@ -317,8 +333,10 @@ def cook(
         Batch size for training, by default 32.
     interaction_count : int, optional
         Maximum number of interactions to include, by default 100000.
-    PCC_cutoff : float, optional
-        Pearson Correlation Coefficient cutoff, by default None.
+    correlation_type : str, optional
+        Type of correlation to use (Pearson or Spearman), by default Pearson.
+    CC_cutoff : float, optional
+        Correlation Coefficient cutoff, by default None.
 
     Returns
     -------
@@ -368,13 +386,13 @@ def cook(
         opt, x_train, x_test, batch_size, original_dim, hidden_layer, latent_dim, epochs
     )
     x_test_encoded = np.array(vae.encoder.predict(x_test, batch_size=batch_size))
-    correlation = create_protein_pairs(x_test_encoded, row_names)
+    correlation = create_protein_pairs(x_test_encoded, row_names, correlation_type)
     final_pairs = correlation[correlation.iloc[:, 0] != correlation.iloc[:, 1]]
     final_pairs = final_pairs.sort_values(by=["Score"], ascending=False)
     final_pairs = pairs_after_cutoff(
         correlation=final_pairs,
         interaction_count=interaction_count,
-        PCC_cutoff=PCC_cutoff,
+        CC_cutoff=CC_cutoff,
     )
     return final_pairs
 
@@ -422,19 +440,19 @@ def main():
     )
     x_test_encoded = np.array(vae.encoder.predict(x_test, batch_size=args.batch_size))
 
-    logging.info(" Calculating Pearson correlation scores.")
-    correlation = create_protein_pairs(x_test_encoded, row_names)
+    logging.info(f" Calculating {args.correlation_type} correlation scores.")
+    correlation = create_protein_pairs(x_test_encoded, row_names, args.correlation_type)
 
     final_pairs = correlation[correlation.iloc[:, 0] != correlation.iloc[:, 1]]
     final_pairs = final_pairs.sort_values(by=["Score"], ascending=False)
     final_pairs = pairs_after_cutoff(
         correlation=final_pairs,
         interaction_count=args.interaction_count,
-        PCC_cutoff=args.PCC_cutoff,
+        CC_cutoff=args.CC_cutoff,
     )
     final_pairs.Score = final_pairs.Score.astype(float).round(5)
     logging.warn(
-        " If it is not the desired cut-off, please check again the value assigned to the related parameter (-n or interaction_count | -c or PCC_cutoff)."
+        " If it is not the desired cut-off, please check again the value assigned to the related parameter (-n or interaction_count | -c or CC_cutoff)."
     )
 
     logging.info(" Saving the file with the interactions in the chosen directory ...")
@@ -442,7 +460,7 @@ def main():
     # Save the file
     np.savetxt(args.output_file, final_pairs, fmt="%s")
     logging.info(
-        " Congratulations! A file is waitiing for you here: " + args.output_file
+        " Congratulations! A file is waiting for you here: " + args.output_file
     )
 
 
