@@ -19,8 +19,8 @@ sys.path.insert(0, os.path.abspath("../../src/favapy"))
 project = "favapy"
 copyright = "2023, Mikaela Koutrouli"
 author = "Mikaela Koutrouli"
-version = "0.3.9"
-release = "0.3.9.4"
+version = "0.4.0"
+release = "0.4.0"
 
 # autodoc
 autosummary_generate = True
