@@ -31,5 +31,8 @@ setuptools.setup(
             "pytest",
             "pytest-cov",
         ],
+        'docs': [
+            'nbsphinx',
+        ]
     },
 )

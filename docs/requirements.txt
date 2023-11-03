@@ -1,6 +1,7 @@
-sphinx>=2.2.0
-ipykernel
+sphinx>=3.0
 nbsphinx
+sphinx_rtd_theme
+ipykernel
 tensorflow
 keras
 numpy
