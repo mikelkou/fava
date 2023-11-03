@@ -1,0 +1,70 @@
+name: Build and publish to PyPI
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    name: Build source distribution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          lfs: 'true'
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build setuptools oldest-supported-numpy flake8
+      - name: Check for syntax errors
+        run: |
+          flake8 ./favapy --count --select=E9,F63,F7,F82 --show-source --statistics
+      - name: Build sdist and wheels
+        run: python -m build
+      - uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: dist/*
+
+
+  build-streamlit-image:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - uses: actions/checkout@v2
+    - id: latest_release
+      uses: pozetroninc/github-action-get-latest-release@master
+      with:
+        owner: mikelkou
+        repo: VAE_Functional_associations
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Build and push to ghcr.io
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: |
+          ghcr.io/mikelkou/favapy:${{ steps.latest_release.outputs.release }}
+          ghcr.io/mikelkou/favapy:latest
+
+  publish-to-pypi:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: dist
+          path: dist
+      - uses: pypa/gh-action-pypi-publish@master
+        with:
+          user: __token__
+          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
