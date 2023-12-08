@@ -23,7 +23,7 @@ pip install favapy
 ```
 
 ## favapy as Python library
-Read the jupyter-notebook: [How_to_use_favapy_in_a_notebook](https://github.com/mikelkou/fava/blob/main/How_to_use_favapy_in_a_notebook.ipynb)
+Read the [How_to_use_favapy_in_a_notebook](https://github.com/mikelkou/fava/blob/main/How_to_use_favapy_in_a_notebook.ipynb) or the [documentation](https://fava.readthedocs.io/en/latest/).
 
 favapy supports both AnnData objects and count/abundance matrices.
 
@@ -34,14 +34,12 @@ Run favapy from the command line as follows:
 favapy <path-to-data-file> <path-to-save-output>
 ```
 
-### Optional parameters:
+#### Optional parameters:
 ```
 
 -t Type of input data ('tsv' or 'csv'). Default value = 'tsv'.
 
 -n The number of interactions in the output file (with both directions, proteinA-proteinB and proteinB-proteinA). Default value = 100000.
-
--cor Type of correlation method ('pearson' or 'spearman'). Default value = 'pearson'
 
 -c The cut-off on the Correlation scores.The scores can range from 1 (high correlation) to -1 (high anti-correlation). This option overwrites the number of interactions. Default value = None.
 
@@ -52,6 +50,8 @@ favapy <path-to-data-file> <path-to-save-output>
 -e The number of epochs. Default value = 50.
 
 -b The  batch size. Default value = 32.
+
+-cor Type of correlation method ('pearson' or 'spearman'). Default value = 'pearson'
 
 
 ```
