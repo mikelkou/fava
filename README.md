@@ -59,4 +59,4 @@ favapy <path-to-data-file> <path-to-save-output>
 If FAVA is useful for your research, consider citing [FAVA BiorXiv](https://doi.org/10.1101/2022.07.06.499022).
 
 #### Other Relevant publications:
-[The STRING database in 2023](https://doi.org/10.1093/nar/gkac1000).
+[The STRING database in 2023](https://doi.org/10.1093/nar/gkac1000)
