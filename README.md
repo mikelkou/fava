@@ -23,7 +23,8 @@ pip install favapy
 ```
 
 ## favapy as Python library
-Read the [How_to_use_favapy_in_a_notebook](https://github.com/mikelkou/fava/blob/main/How_to_use_favapy_in_a_notebook.ipynb) or the [documentation](https://fava.readthedocs.io/en/latest/).
+Read the [How_to_use_favapy_in_a_notebook](https://github.com/mikelkou/fava/blob/main/How_to_use_favapy_in_a_notebook.ipynb) or/and the [documentation](https://fava.readthedocs.io/en/latest/).
+Relevant parameters for [fava.cook](https://fava.readthedocs.io/en/latest/API.html#fava.cook).
 
 favapy supports both AnnData objects and count/abundance matrices.
 
