@@ -89,7 +89,7 @@ def argument_parser():
     return args
 
 
-def load_data(input_file, data_type):
+def _load_data(input_file, data_type):
     """
     Loads and preprocesses data from a file.
 
@@ -189,7 +189,8 @@ class VAE(keras.Model):
             )
             return z_mean + K.exp(z_log_sigma) * epsilon
 
-        z = layers.Lambda(sampling)([z_mean, z_log_sigma])
+        # z = layers.Lambda(sampling)([z_mean, z_log_sigma])
+        z = layers.Lambda(sampling, output_shape=(latent_dim,))([z_mean, z_log_sigma])
 
         # Create encoder
         encoder = keras.Model(inputs, [z_mean, z_log_sigma, z], name="encoder")
@@ -225,7 +226,86 @@ class VAE(keras.Model):
         )
 
 
-def create_protein_pairs(x_test_encoded, row_names, correlation_type="pearson"):
+######### Code for multiprocessing correlations --> slower #########
+import multiprocessing as mp
+import time
+
+
+def _calculate_correlation(sub_df, correlation_type):
+    if correlation_type == "spearman":
+        corr = sub_df.corr(method="spearman")
+    else:
+        corr_matrix = np.corrcoef(sub_df)
+        corr = pd.DataFrame(corr_matrix, index=sub_df.index, columns=sub_df.index)
+    return corr
+
+
+def _create_protein_pairs_parallel(
+    x_test_encoded, row_names, correlation_type="pearson", num_processes=4
+):
+    start_time = time.time()
+
+    df_x_test_encoded = pd.concat(
+        [pd.DataFrame(x_test_encoded[i, :, :]) for i in range(x_test_encoded.shape[0])],
+        axis=1,
+    )
+    df_x_test_encoded.index = row_names
+
+    # Split DataFrame into chunks for parallel processing
+    chunks = [df_x_test_encoded.iloc[i::num_processes] for i in range(num_processes)]
+    print(chunks)
+    # Create a pool of processes
+    pool = mp.Pool(processes=num_processes)
+
+    # Calculate correlations in parallel
+    results = [
+        pool.apply_async(_calculate_correlation, args=(chunk, correlation_type))
+        for chunk in chunks
+    ]
+
+    correlations = pd.DataFrame(columns=row_names, index=row_names)
+    for r in results:
+        corr_chunk = r.get()
+        for idx in corr_chunk.index:
+            correlations.loc[idx, corr_chunk.columns] = corr_chunk.loc[idx, :]
+
+    pool.close()
+    pool.join()
+
+    threshold = 0.85
+    threshold_decrement = 0.05
+    max_iterations = 5
+
+    for _ in range(max_iterations):
+        high_corr = correlations.where(
+            (np.abs(correlations) > threshold) & (np.abs(correlations) < 1)
+        )
+
+        if high_corr.stack().empty:
+            threshold -= threshold_decrement  # Decrease the threshold
+            print(
+                f"No correlations above threshold. Decreasing threshold to {threshold}"
+            )
+            if threshold <= 0:
+                print("Threshold reached 0. No further reduction possible.")
+                break
+        else:
+            correlation_df = high_corr.stack().reset_index()
+            print(f"Correlations found above threshold {threshold}.")
+            end_time = time.time()
+            break
+
+    total_time = end_time - start_time
+    print(f"Total time taken: {total_time} seconds")
+    correlation_df.columns = ["Protein_1", "Protein_2", "Score"]
+
+    return correlation_df
+
+
+###################################################################################################
+
+
+def _create_protein_pairs(x_test_encoded, row_names, correlation_type="pearson"):
     """
     Create pairs of proteins based on their encoded latent spaces.
 
@@ -243,6 +323,7 @@ def create_protein_pairs(x_test_encoded, row_names, correlation_type="pearson"):
     correlation_df : pd.DataFrame
         DataFrame containing protein pairs and correlation scores.
     """
+    start_time = time.time()
     # Concatenate latent spaces
     df_x_test_encoded_0 = pd.DataFrame(x_test_encoded[0, :, :])
     df_x_test_encoded_1 = pd.DataFrame(x_test_encoded[1, :, :])
@@ -267,12 +348,14 @@ def create_protein_pairs(x_test_encoded, row_names, correlation_type="pearson"):
 
     correlation_df = corr.stack().reset_index()
 
-    # set column names
+    end_time = time.time()
+    total_time = end_time - start_time
+    print(f"Total time taken OLD: {total_time} seconds")
     correlation_df.columns = ["Protein_1", "Protein_2", "Score"]
     return correlation_df
 
 
-def pairs_after_cutoff(correlation, interaction_count=100000, CC_cutoff=None):
+def _pairs_after_cutoff(correlation, interaction_count=100000, CC_cutoff=None):
     """
     Filter protein pairs based on correlation scores and cutoffs.
 
@@ -343,7 +426,12 @@ def cook(
     final_pairs : pd.DataFrame
         Filtered protein pairs based on correlation and cutoffs.
     """
+    from scipy.sparse import issparse
+
     if type(data) == anndata._core.anndata.AnnData:
+        # if issparse(data.X):
+        data.X = data.X.toarray()
+        data.var.index.name = None
         x = data.X.T
         row_names = data.var.index
     else:
@@ -386,10 +474,12 @@ def cook(
         opt, x_train, x_test, batch_size, original_dim, hidden_layer, latent_dim, epochs
     )
     x_test_encoded = np.array(vae.encoder.predict(x_test, batch_size=batch_size))
-    correlation = create_protein_pairs(x_test_encoded, row_names, correlation_type)
+    correlation = _create_protein_pairs(x_test_encoded, row_names, correlation_type)
+    # correlation = _create_protein_pairs_parallel(x_test_encoded, row_names, correlation_type, num_processes=6)
+
     final_pairs = correlation[correlation.iloc[:, 0] != correlation.iloc[:, 1]]
     final_pairs = final_pairs.sort_values(by=["Score"], ascending=False)
-    final_pairs = pairs_after_cutoff(
+    final_pairs = _pairs_after_cutoff(
         correlation=final_pairs,
         interaction_count=interaction_count,
         CC_cutoff=CC_cutoff,
@@ -407,7 +497,7 @@ def main():
     """
     args = argument_parser()
 
-    x, row_names = load_data(args.input_file, args.data_type)
+    x, row_names = _load_data(args.input_file, args.data_type)
     original_dim = x.shape[1]
 
     if args.hidden_layer == None:
@@ -441,11 +531,13 @@ def main():
     x_test_encoded = np.array(vae.encoder.predict(x_test, batch_size=args.batch_size))
 
     logging.info(f" Calculating {args.correlation_type} correlation scores.")
-    correlation = create_protein_pairs(x_test_encoded, row_names, args.correlation_type)
+    correlation = _create_protein_pairs(
+        x_test_encoded, row_names, args.correlation_type
+    )
 
     final_pairs = correlation[correlation.iloc[:, 0] != correlation.iloc[:, 1]]
     final_pairs = final_pairs.sort_values(by=["Score"], ascending=False)
-    final_pairs = pairs_after_cutoff(
+    final_pairs = _pairs_after_cutoff(
         correlation=final_pairs,
         interaction_count=args.interaction_count,
         CC_cutoff=args.CC_cutoff,
