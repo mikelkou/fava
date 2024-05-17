@@ -40,7 +40,9 @@ favapy <path-to-data-file> <path-to-save-output>
 
 -n The number of interactions in the output file (with both directions, proteinA-proteinB and proteinB-proteinA). Default value = 100000.
 
--c The cut-off on the Pearson Correlation scores.The scores can range from 1 (high correlation) to -1 (high anti-correlation). This option overwrites the number of interactions. Default value = None.
+-cor Type of correlation method ('pearson' or 'spearman'). Default value = 'pearson'
+
+-c The cut-off on the Correlation scores.The scores can range from 1 (high correlation) to -1 (high anti-correlation). This option overwrites the number of interactions. Default value = None.
 
 -d The dimensions of the intermediate\hidden layer. Default value depends on the input size.
 
@@ -49,6 +51,7 @@ favapy <path-to-data-file> <path-to-save-output>
 -e The number of epochs. Default value = 50.
 
 -b The  batch size. Default value = 32.
+
 
 ```
 
