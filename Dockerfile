@@ -1,7 +1,10 @@
-FROM python:3
+FROM python:3.10-slim
 
-COPY favapy/ pyproject.toml setup.cfg ./
+WORKDIR /app
 
-RUN pip install tensorflow keras numpy pandas
+COPY pyproject.toml requirements.txt ./
+COPY src/ ./src/
 
-CMD [ "python", "-m", "favapy" ]
+RUN pip install --no-cache-dir .
+
+CMD ["favapy"]

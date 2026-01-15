@@ -18,7 +18,7 @@ def data_dir() -> Path:
 @pytest.fixture
 def test_dataset(data_dir) -> pd.DataFrame:
     data_file_path = data_dir / "Example_dataset_GSE75748_sc_cell_type_ec.tsv"
-    return pd.read_csv(data_file_path, sep="\t").iloc[:100, :100]
+    return pd.read_csv(data_file_path, sep="\t", index_col=0).iloc[:100, :100]
 
 
 def test_favapy(test_dataset):

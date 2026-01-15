@@ -3,7 +3,6 @@ nbsphinx
 sphinx_rtd_theme
 ipykernel
 tensorflow
-keras
 numpy
 pandas
 anndata

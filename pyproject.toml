@@ -1,3 +1,46 @@
 [build-system]
-requires = ["setuptools>=42"]
-build-backend = "setuptools.build_meta"
+requires = ['setuptools>=42']
+build-backend = 'setuptools.build_meta'
+
+[project]
+name = 'favapy'
+version = '1.0.1'
+description = 'Infer Functional Associations using Variational Autoencoders on -Omics data.'
+readme = 'README.md'
+license = {text = 'MIT'}
+requires-python = '>=3.10'
+authors = [
+    {name = 'Mikaela Koutrouli', email = 'mikaela.koutrouli@cpr.ku.dk'},
+]
+classifiers = [
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
+    'License :: OSI Approved :: MIT License',
+    'Operating System :: OS Independent',
+    'Intended Audience :: Science/Research',
+    'Topic :: Scientific/Engineering :: Bio-Informatics',
+]
+dependencies = [
+    'tensorflow>=2',
+    'numpy',
+    'pandas',
+    'anndata',
+    'scipy',
+]
+
+[project.optional-dependencies]
+gpu = ['tensorflow[and-cuda]>=2']
+test = ['pytest', 'pytest-cov']
+docs = ['nbsphinx']
+
+[project.urls]
+Homepage = 'https://github.com/mikelkou/VAE_Functional_associations'
+'Bug Tracker' = 'https://github.com/mikelkou/VAE_Functional_associations/issues'
+
+[project.scripts]
+favapy = 'favapy.fava:main'
+
+[tool.setuptools.packages.find]
+where = ['src']

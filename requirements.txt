@@ -1,0 +1,5 @@
+tensorflow>=2
+numpy
+pandas
+anndata
+scipy
