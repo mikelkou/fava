@@ -20,7 +20,6 @@ from .utils import (
     _create_protein_pairs,
 )
 
-
 # Configure TensorFlow threading
 tf.config.threading.set_intra_op_parallelism_threads(1)
 tf.config.threading.set_inter_op_parallelism_threads(1)
