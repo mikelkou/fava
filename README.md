@@ -17,10 +17,25 @@ Read the [documentation](https://fava.readthedocs.io/en/latest/).
 ## Data availability
 [The Combined Network](https://doi.org/10.5281/zenodo.6803472)
 
-## Installation:
-```
-pip install favapy
-```
+## Installation
+
+Due to specific dependency requirements, it is highly recommended to install `favapy` in a dedicated environment using Python 3.11 to ensure compatibility with TensorFlow and Keras.
+
+You can set this up using `mamba` (or `conda`) and `pip`:
+
+```bash
+# Create and activate a new environment
+mamba create -n favapy -c conda-forge python=3.11 pip -y
+mamba activate favapy
+
+# Upgrade pip
+python -m pip install --upgrade pip
+
+# Install favapy along with pinned dependencies
+python -m pip install \
+  "tensorflow==2.15.0" \
+  "keras==2.15.0" \
+  "favapy==1.0.1"
 
 ## favapy as Python library
 Read the [How_to_use_favapy_in_a_notebook](https://github.com/mikelkou/fava/blob/main/How_to_use_favapy_in_a_notebook.ipynb) or/and the [documentation](https://fava.readthedocs.io/en/latest/).
